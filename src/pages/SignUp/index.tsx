@@ -44,10 +44,6 @@ const SignUp: React.FC = () => {
   const emailInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
 
-  // const handleSubmit = useCallback((data: object) => {
-  //   console.log(data);
-  // }, []);
-
   const handleSubmit = useCallback(
     async (data: SignUpFormData) => {
       console.log(data);
@@ -67,12 +63,6 @@ const SignUp: React.FC = () => {
 
         await api.post("/users", data);
 
-        // addToast({
-        //   type: "success",
-        //   title: "Cadastro realizado!",
-        //   description: "Você já pode fazer login!",
-        // });
-
         Alert.alert("Cadastro Realizado!", "Agora você já pode logar!");
 
         navigation.goBack();
@@ -88,13 +78,6 @@ const SignUp: React.FC = () => {
           "Erro no cadastro.",
           "Verifique seu usuário e senha e tente novamente."
         );
-
-        //disparar toast
-        // addToast({
-        //   type: "error",
-        //   title: "Erro no cadastro.",
-        //   description: "Verifique seus dados e tente novamente.",
-        // });
       }
     },
     [navigation]
