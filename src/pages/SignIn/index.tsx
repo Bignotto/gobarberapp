@@ -6,6 +6,7 @@ import {
   View,
   ScrollView,
   TextInput,
+  Alert,
 } from "react-native";
 
 import {
@@ -27,13 +28,54 @@ import { FormHandles } from "@unform/core";
 import logoImg from "../../assets/logo.png";
 import { useNavigation } from "@react-navigation/native";
 
+import * as Yup from "yup";
+import { getValidationErrors } from "../../utils/getValidationErrors";
+
+interface SignInFormData {
+  email: string;
+  password: string;
+}
+
 const SignIn: React.FC = () => {
   const navigation = useNavigation();
   const passwordInputRef = useRef<TextInput>(null);
   const formRef = useRef<FormHandles>(null);
 
-  const handleSubmit = useCallback((data: object) => {
+  // const handleSubmit = useCallback((data: object) => {
+  //   console.log(data);
+  // }, []);
+
+  const handleSubmit = useCallback(async (data: SignInFormData) => {
     console.log(data);
+    try {
+      formRef.current?.setErrors({});
+      const schema = Yup.object().shape({
+        email: Yup.string()
+          .required("E-Mail é obrigatório!")
+          .email("Informe um e-mail válido."),
+        password: Yup.string().min(6, "Senha precisa ter 6 dígitos."),
+      });
+
+      await schema.validate(data, {
+        abortEarly: false,
+      });
+
+      // await signIn({ email: data.email, password: data.password });
+
+      // history.push("/dashboard");
+    } catch (error) {
+      if (error instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(error);
+        formRef.current?.setErrors(errors);
+        console.log(errors);
+        return;
+      }
+
+      // Alert.alert(
+      //   "Erro na Autenticação",
+      //   "Verifique seu usuário e senha e tente novamente."
+      // );
+    }
   }, []);
 
   return (
