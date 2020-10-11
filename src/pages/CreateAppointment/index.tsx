@@ -28,6 +28,8 @@ import {
   SectionContent,
   Hour,
   HourText,
+  CreateAppointmentButton,
+  CreateAppointmentButtonText,
 } from "./styles";
 
 export interface Provider {
@@ -81,6 +83,7 @@ const CreateAppointment: React.FC = () => {
       })
       .then(response => {
         setAvailability(response.data);
+        setSelectedHour(0);
       });
   }, [selectedDate, selectedProvider]);
 
@@ -105,6 +108,26 @@ const CreateAppointment: React.FC = () => {
   const handleSelectHour = useCallback((hour: number) => {
     setSelectedHour(hour);
   }, []);
+
+  const handleCreateAppointment = useCallback(async () => {
+    const date = new Date(selectedDate);
+
+    date.setHours(selectedHour);
+    date.setMinutes(0);
+
+    try {
+      await api.post("appointments", {
+        provider_id: selectedProvider,
+        date,
+      });
+
+      navigate.navigate("AppointmentCreated", {
+        date: date.getTime(),
+      });
+    } catch (error) {
+      Alert.alert("Erro", "Ocorreu um erro ao tentar agendar o seu horário.");
+    }
+  }, [navigate, selectedDate, selectedProvider, selectedHour]);
 
   const morningAvailability = useMemo(() => {
     return availability
@@ -219,6 +242,10 @@ const CreateAppointment: React.FC = () => {
             </SectionContent>
           </Section>
         </Schedule>
+
+        <CreateAppointmentButton onPress={handleCreateAppointment}>
+          <CreateAppointmentButtonText>Agendar</CreateAppointmentButtonText>
+        </CreateAppointmentButton>
       </Container>
     </>
   );
